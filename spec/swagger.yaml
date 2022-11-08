@@ -1,0 +1,277 @@
+openapi: 3.0.3
+info:
+  title: AnimalClassifier API
+  version: 1.0.0
+servers:
+- url: /
+security:
+- bearerAuth: []
+paths:
+  /events:
+    get:
+      description: Lists events
+      operationId: list_events
+      parameters:
+      - description: Created after filter
+        explode: true
+        in: query
+        name: createdAfter
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      - description: Created before filter
+        explode: true
+        in: query
+        name: createdBefore
+        required: false
+        schema:
+          format: date-time
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Event'
+                type: array
+          description: A event list
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      summary: List events.
+      tags:
+      - Events
+      x-openapi-router-controller: animal_classifier_server.controllers.events_controller
+    post:
+      description: Creates new event
+      operationId: create_event
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+        description: Payload
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: Created event
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      summary: Create a event.
+      tags:
+      - Events
+      x-openapi-router-controller: animal_classifier_server.controllers.events_controller
+  /events/{eventId}:
+    delete:
+      description: Deletes event
+      operationId: delete_event
+      parameters:
+      - description: event id
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Success
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      summary: Deletes a event.
+      tags:
+      - Events
+      x-openapi-router-controller: animal_classifier_server.controllers.events_controller
+    get:
+      description: Finds a event by id
+      operationId: find_event
+      parameters:
+      - description: event id
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: A event
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      summary: Find a event.
+      tags:
+      - Events
+      x-openapi-router-controller: animal_classifier_server.controllers.events_controller
+    put:
+      description: Updates event
+      operationId: update_event
+      parameters:
+      - description: event id
+        explode: false
+        in: path
+        name: eventId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Event'
+        description: Payload
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+          description: Updated event
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      summary: Updates a event.
+      tags:
+      - Events
+      x-openapi-router-controller: animal_classifier_server.controllers.events_controller
+  /system/ping:
+    get:
+      operationId: ping
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                description: Returns PING
+                type: string
+          description: System ping response
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: unexpected error
+      summary: System ping endpoint
+      tags:
+      - system
+      x-openapi-router-controller: animal_classifier_server.controllers.system_controller
+components:
+  schemas:
+    Event:
+      description: map enabled event
+      example:
+        image: image
+        classifications:
+        - result: result
+          confidence: 6.027456183070403
+        - result: result
+          confidence: 6.027456183070403
+        created: 2000-01-23T04:56:07.000+00:00
+        latitude: 1.4658129805029452
+        modified: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        longitude: 5.962133916683182
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          title: id
+          type: integer
+        image:
+          title: image
+          type: string
+        classifications:
+          items:
+            $ref: '#/components/schemas/Classification'
+          title: classifications
+          type: array
+        latitude:
+          title: latitude
+          type: number
+        longitude:
+          title: longitude
+          type: number
+        created:
+          format: date-time
+          readOnly: true
+          title: created
+          type: string
+        modified:
+          format: date-time
+          readOnly: true
+          title: modified
+          type: string
+      required:
+      - identifier
+      title: Event
+      type: object
+    Classification:
+      description: Single classification for event
+      example:
+        result: result
+        confidence: 6.027456183070403
+      properties:
+        result:
+          title: result
+          type: string
+        confidence:
+          title: confidence
+          type: number
+      title: Classification
+      type: object
+    Error:
+      properties:
+        code:
+          format: int32
+          title: code
+          type: integer
+        message:
+          title: message
+          type: string
+      required:
+      - code
+      - message
+      title: Error
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+      x-bearerInfoFunc: animal_classifier_server.controllers.security_controller_.info_from_bearerAuth

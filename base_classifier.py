@@ -13,7 +13,7 @@ from mqtt import MQTTUtils
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print >> sys.stderr, "Usage: mqtt_wordcount.py <broker url> <topic>"
+        print >> sys.stderr, "Usage: base_classifier.py <broker url> <topic>"
         exit(-1)
 
     sc = SparkContext(appName="AnimalClassifier")
