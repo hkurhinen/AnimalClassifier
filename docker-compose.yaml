@@ -5,4 +5,12 @@ services:
     ports:
       - 1883:1883
       - 9001:9001
-    command: mosquitto -c /mosquitto-no-auth.conf 
+    command: mosquitto -c /mosquitto-no-auth.conf
+  mongo:
+    image: mongo
+    ports:
+    - 27017:27017
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: random

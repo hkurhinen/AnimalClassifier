@@ -4,8 +4,8 @@ info:
   version: 1.0.0
 servers:
 - url: /
-security:
-- bearerAuth: []
+#security:
+# - bearerAuth: []
 paths:
   /events:
     get:
@@ -210,7 +210,6 @@ components:
       properties:
         id:
           format: int64
-          readOnly: true
           title: id
           type: integer
         image:
@@ -229,16 +228,12 @@ components:
           type: number
         created:
           format: date-time
-          readOnly: true
           title: created
           type: string
         modified:
           format: date-time
-          readOnly: true
           title: modified
           type: string
-      required:
-      - identifier
       title: Event
       type: object
     Classification:
@@ -269,9 +264,9 @@ components:
       - message
       title: Error
       type: object
-  securitySchemes:
-    bearerAuth:
-      bearerFormat: JWT
-      scheme: bearer
-      type: http
-      x-bearerInfoFunc: animal_classifier_server.controllers.security_controller_.info_from_bearerAuth
+#  securitySchemes:
+#    bearerAuth:
+#      bearerFormat: JWT
+#      scheme: bearer
+#      type: http
+#      x-bearerInfoFunc: animal_classifier_server.controllers.security_controller_.info_from_bearerAuth

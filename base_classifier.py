@@ -8,6 +8,7 @@ from keras.applications import ResNet50
 from keras.utils import load_img, img_to_array
 from keras.applications.resnet import preprocess_input, decode_predictions
 import numpy as np
+import requests
 
 from mqtt import MQTTUtils
 
@@ -39,10 +40,34 @@ if __name__ == "__main__":
         x = preprocess_input(x)
 
         preds = model.predict(x)
-        # decode the results into a list of tuples (class, description, probability)
-        # (one such list for each sample in the batch)
-        print('Predicted:', decode_predictions(preds, top=3)[0])
-        
+        cs = decode_predictions(preds, top=3)[0]
+        classifications = []
+        for c in cs:
+          (r, desc, prob) = c
+          classifications.append({
+            "confidence": float(prob),
+            "result": desc
+          })
+
+        #print("Classification")
+        #print(classification)
+        #print("Description")
+        #print(description)
+        #print("Probability")
+        #print(probablity)
+
+        obj = { 
+          "id": 1,
+          "image": path,
+          "latitude": 61.667308,
+          "longitude": 27.359664,
+          "created": "2000-01-23T04:56:07.000+00:00",
+          "modified": "2000-01-23T04:56:07.000+00:00",
+          "classifications": classifications
+        }
+
+        x = requests.post("http://localhost:8080/events", json = obj)
+        print(x.text)
 
     stream.foreachRDD( lambda rdd: readStream(rdd) )
     ssc.start()

@@ -7,9 +7,12 @@ from typing import Union
 from animal_classifier_server.models.error import Error  # noqa: E501
 from animal_classifier_server.models.event import Event  # noqa: E501
 from animal_classifier_server import util
+from animal_classifier_server.database.db import get_database
 
+from bson import json_util
+import json
 
-def create_event(event):  # noqa: E501
+def create_event():  # noqa: E501
     """Create a event.
 
     Creates new event # noqa: E501
@@ -21,6 +24,8 @@ def create_event(event):  # noqa: E501
     """
     if connexion.request.is_json:
         event = Event.from_dict(connexion.request.get_json())  # noqa: E501
+        db = get_database()
+        db["events"].insert_one(event.to_dict())
     return 'do some magic!'
 
 
@@ -64,7 +69,8 @@ def list_events(created_after=None, created_before=None):  # noqa: E501
     """
     created_after = util.deserialize_datetime(created_after)
     created_before = util.deserialize_datetime(created_before)
-    return 'do some magic!'
+    db = get_database()
+    return json.loads(json_util.dumps(list(db["events"].find())))
 
 
 def update_event(event_id, event):  # noqa: E501
