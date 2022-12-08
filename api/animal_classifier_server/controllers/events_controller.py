@@ -24,9 +24,10 @@ def create_event():  # noqa: E501
     """
     if connexion.request.is_json:
         event = Event.from_dict(connexion.request.get_json())  # noqa: E501
+        print(event.to_dict())
         db = get_database()
         db["events"].insert_one(event.to_dict())
-    return 'do some magic!'
+    return '201 Created'
 
 
 def delete_event(event_id):  # noqa: E501
@@ -39,7 +40,14 @@ def delete_event(event_id):  # noqa: E501
 
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    if (isinstance(event_id, int)):
+        db = get_database()
+        delete_event = db.events.delete_one({"id":event_id})
+        print ('event deleted!!!')
+        if(delete_event.deleted_count == 1):
+            return ('204 No content')
+    return 'Invalid ID'
+
 
 
 def find_event(event_id):  # noqa: E501
@@ -52,7 +60,12 @@ def find_event(event_id):  # noqa: E501
 
     :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    if (isinstance(event_id, int)):
+        db = get_database()
+        event = db.events.find({"id":event_id})
+        if(event is not None):
+            return json.loads(json_util.dumps((db["events"].find({"id":event_id}))))
+    return '404 not found! Invalid Id'
 
 
 def list_events(created_after=None, created_before=None):  # noqa: E501
@@ -85,6 +98,4 @@ def update_event(event_id, event):  # noqa: E501
 
     :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
     """
-    if connexion.request.is_json:
-        event = Event.from_dict(connexion.request.get_json())  # noqa: E501
     return 'do some magic!'
