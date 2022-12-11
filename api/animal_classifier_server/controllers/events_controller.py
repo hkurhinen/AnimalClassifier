@@ -60,8 +60,13 @@ def find_event(event_id):  # noqa: E501
     """
     if (isinstance(event_id, int)):
         db = get_database()
-        return json.loads(json_util.dumps((db["events"].find({"id":event_id}))))          
-    return ('{"code": 400,"message": "Invalid Id"}' ) # need improvement for id which is not in the collection
+        event_res = json.loads(json_util.dumps((db["events"].find({"id":event_id})))) 
+        if(event_res == []):
+            print(event_res)
+            return ('404 Collection not found')
+        else:
+            return event_res          
+    return ('404 Not found:  Invalid ID' ) # need improvement for id which is not in the collection
 
 
 def list_events(created_after=None, created_before=None):  # noqa: E501
@@ -98,12 +103,11 @@ def update_event(event_id):  # noqa: E501
     
     if (isinstance(event_id, int)):
         db = get_database()
-        event_res = json.loads(json_util.dumps((db["events"].find({"id":event_id}))))
-        if(event_res == []):
-            print(event_res)
-            return ('404 Collection not found')
+        event_res = find_event(event_id)
+        if(event_res == []):    
+            return ('404 Collection not found.')
         else:
             event = Event.from_dict(connexion.request.get_json())
             db["events"].replace_one({"id":event_id}, event.to_dict())
             return ('204 updated successfully' )
-    return ('{"code": 404,"message": "Invalid Id"}' )
+    return ('404 Not found: Invalid Id.' )
