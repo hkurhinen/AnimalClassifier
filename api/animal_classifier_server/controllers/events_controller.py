@@ -24,10 +24,9 @@ def create_event():  # noqa: E501
     """
     if connexion.request.is_json:
         event = Event.from_dict(connexion.request.get_json())  # noqa: E501
-        print(event.to_dict())
         db = get_database()
         db["events"].insert_one(event.to_dict())
-    return '201 Created'
+    return '201 Created successfully.'
 
 
 def delete_event(event_id):  # noqa: E501
@@ -43,9 +42,8 @@ def delete_event(event_id):  # noqa: E501
     if (isinstance(event_id, int)):
         db = get_database()
         delete_event = db.events.delete_one({"id":event_id})
-        print ('event deleted!!!')
         if(delete_event.deleted_count == 1):
-            return ('204 No content')
+            return ('204 No content, deleted successfully.')
     return 'Invalid ID'
 
 
@@ -62,10 +60,8 @@ def find_event(event_id):  # noqa: E501
     """
     if (isinstance(event_id, int)):
         db = get_database()
-        event = db.events.find({"id":event_id})
-        if(event is not None):
-            return json.loads(json_util.dumps((db["events"].find({"id":event_id}))))
-    return '404 not found! Invalid Id'
+        return json.loads(json_util.dumps((db["events"].find({"id":event_id}))))          
+    return ('{"code": 400,"message": "Invalid Id"}' ) # need improvement for id which is not in the collection
 
 
 def list_events(created_after=None, created_before=None):  # noqa: E501
@@ -87,7 +83,7 @@ def list_events(created_after=None, created_before=None):  # noqa: E501
 
 
 
-def update_event(event_id, event):  # noqa: E501
+def update_event(event_id):  # noqa: E501
     """Updates a event.
 
     Updates event # noqa: E501
@@ -100,4 +96,14 @@ def update_event(event_id, event):  # noqa: E501
     :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
     """
     
-    return 'do some magic!'
+    if (isinstance(event_id, int)):
+        db = get_database()
+        event_res = json.loads(json_util.dumps((db["events"].find({"id":event_id}))))
+        if(event_res == []):
+            print(event_res)
+            return ('404 Collection not found')
+        else:
+            event = Event.from_dict(connexion.request.get_json())
+            db["events"].replace_one({"id":event_id}, event.to_dict())
+            return ('204 updated successfully' )
+    return ('{"code": 404,"message": "Invalid Id"}' )
