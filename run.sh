@@ -1,1 +1,1 @@
-./venv/bin/spark-submit --packages org.apache.bahir:spark-streaming-mqtt_2.12:2.4.0 base_classifier.py tcp://localhost:1883 base
+./venv/bin/spark-submit --packages org.apache.bahir:spark-streaming-mqtt_2.12:2.4.0 base_classifier.py tcp://localhost:1883 base http://localhost:8080
