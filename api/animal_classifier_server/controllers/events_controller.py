@@ -81,10 +81,14 @@ def list_events(created_after=None, created_before=None):  # noqa: E501
 
     :rtype: Union[List[Event], Tuple[List[Event], int], Tuple[List[Event], int, Dict[str, str]]
     """
-    created_after = util.deserialize_datetime(created_after)
-    created_before = util.deserialize_datetime(created_before)
-    db = get_database()
-    return json.loads(json_util.dumps(list(db["events"].find({"created":{"$gte": created_after, "$lt": created_before}}))))
+    if(created_before == None or created_after == None):
+        db = get_database()
+        return json.loads(json_util.dumps(list(db["events"].find())))
+    else:
+        created_after = util.deserialize_datetime(created_after)
+        created_before = util.deserialize_datetime(created_before)
+        db = get_database()
+        return json.loads(json_util.dumps(list(db["events"].find({"created":{"$gte": created_after, "$lt": created_before}}))))
 
 
 
