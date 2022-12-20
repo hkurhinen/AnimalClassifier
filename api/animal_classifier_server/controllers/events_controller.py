@@ -26,7 +26,7 @@ def create_event():  # noqa: E501
         event = Event.from_dict(connexion.request.get_json())  # noqa: E501
         db = get_database()
         db["events"].insert_one(event.to_dict())
-    return 'do some magic!'
+    return '201 Created successfully.'
 
 
 def delete_event(event_id):  # noqa: E501
@@ -39,7 +39,13 @@ def delete_event(event_id):  # noqa: E501
 
     :rtype: Union[None, Tuple[None, int], Tuple[None, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    if (isinstance(event_id, int)):
+        db = get_database()
+        delete_event = db.events.delete_one({"id":event_id})
+        if(delete_event.deleted_count == 1):
+            return ('204 No content, deleted successfully.')
+    return 'Invalid ID'
+
 
 
 def find_event(event_id):  # noqa: E501
@@ -52,7 +58,15 @@ def find_event(event_id):  # noqa: E501
 
     :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
     """
-    return 'do some magic!'
+    if (isinstance(event_id, int)):
+        db = get_database()
+        event_res = json.loads(json_util.dumps((db["events"].find({"id":event_id})))) 
+        if(event_res == []):
+            print(event_res)
+            return ('404 Collection not found')
+        else:
+            return event_res          
+    return ('404 Not found:  Invalid ID' ) # need improvement for id which is not in the collection
 
 
 def list_events(created_after=None, created_before=None):  # noqa: E501
@@ -67,13 +81,18 @@ def list_events(created_after=None, created_before=None):  # noqa: E501
 
     :rtype: Union[List[Event], Tuple[List[Event], int], Tuple[List[Event], int, Dict[str, str]]
     """
-    created_after = util.deserialize_datetime(created_after)
-    created_before = util.deserialize_datetime(created_before)
-    db = get_database()
-    return json.loads(json_util.dumps(list(db["events"].find())))
+    if(created_before == None or created_after == None):
+        db = get_database()
+        return json.loads(json_util.dumps(list(db["events"].find())))
+    else:
+        created_after = util.deserialize_datetime(created_after)
+        created_before = util.deserialize_datetime(created_before)
+        db = get_database()
+        return json.loads(json_util.dumps(list(db["events"].find({"created":{"$gte": created_after, "$lt": created_before}}))))
 
 
-def update_event(event_id, event):  # noqa: E501
+
+def update_event(event_id):  # noqa: E501
     """Updates a event.
 
     Updates event # noqa: E501
@@ -85,6 +104,14 @@ def update_event(event_id, event):  # noqa: E501
 
     :rtype: Union[Event, Tuple[Event, int], Tuple[Event, int, Dict[str, str]]
     """
-    if connexion.request.is_json:
-        event = Event.from_dict(connexion.request.get_json())  # noqa: E501
-    return 'do some magic!'
+    
+    if (isinstance(event_id, int)):
+        db = get_database()
+        event_res = find_event(event_id)
+        if(event_res == []):    
+            return ('404 Collection not found.')
+        else:
+            event = Event.from_dict(connexion.request.get_json())
+            db["events"].replace_one({"id":event_id}, event.to_dict())
+            return ('204 updated successfully' )
+    return ('404 Not found: Invalid Id.' )
