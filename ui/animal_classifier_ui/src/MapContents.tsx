@@ -33,7 +33,7 @@ function MapContents() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch("http://localhost:8080/events")
+      fetch(`${process.env.REACT_APP_API_URL}/events`)
         .then(res => res.json())
         .then(newEvents => {
           newEvents.forEach((newEvent: any) => {
