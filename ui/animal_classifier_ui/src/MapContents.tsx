@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import { Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import Noty from 'noty';
+import moment from 'moment';
 
 //This function takes in latitude and longitude of two location and returns the distance between them as the crow flies (in km)
 function calcDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -29,11 +30,13 @@ function MapContents() {
   const [events, setEvents] = useState([]);
   const [drivingMode, setDrivingMode] = useState(false);
   const [currentPos, setCurrentPos] = useState([0, 0]);
+  const [historyTime, setHistoryTime] = useState("15");
   const map = useMap();
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch(`${process.env.REACT_APP_API_URL}/events`)
+      const after = moment().subtract(Number(historyTime), "minutes");
+      fetch(`${process.env.REACT_APP_API_URL}/events?createdAfter=${after.toISOString()}&createdBefore=${moment().toISOString()}`)
         .then(res => res.json())
         .then(newEvents => {
           newEvents.forEach((newEvent: any) => {
@@ -58,7 +61,7 @@ function MapContents() {
     return () => {
       clearInterval(interval);
     };
-  }, [events, currentPos]);
+  }, [events, currentPos, historyTime]);
 
   useEffect(() => {
     let watch: any = null;
@@ -110,6 +113,23 @@ function MapContents() {
         <div className="leaflet-top leaflet-right">
           <div className="leaflet-control leaflet-bar">
             <a href="#" onClick={() => setDrivingMode(!drivingMode)} style={{width: "110px"}}>{ drivingMode ? "Stop driving mode" : "Start driving mode" }</a>
+          </div>
+        </div>
+        <div className="leaflet-bottom leaflet-left">
+          <div style={{padding: 5, backgroundColor: "rgb(244, 244, 244)"}} className="leaflet-control leaflet-bar">
+            <label>Show history: </label>
+            <select 
+              onChange={(event) => setHistoryTime(event.currentTarget.value)}
+              value={historyTime} 
+              id="history-retention">
+                <option value="1">1 minutes</option>
+                <option value="5">5 minutes</option>
+                <option value="15">15 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="120">2 hour</option>
+                <option value="360">6 hour</option>
+                <option value="1440">24 hour</option>
+            </select>
           </div>
         </div>
     </>
