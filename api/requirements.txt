@@ -11,3 +11,4 @@ setuptools >= 21.0.0
 Flask == 2.1.1
 flask_cors >= 3.0.1
 pymongo == 4.3.3
+paho-mqtt == 1.6.1
