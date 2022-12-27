@@ -3,6 +3,7 @@ import './App.css';
 import { Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import Noty from 'noty';
 import moment from 'moment';
+import MarkerClusterGroup from '@changey/react-leaflet-markercluster';
 
 //This function takes in latitude and longitude of two location and returns the distance between them as the crow flies (in km)
 function calcDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
@@ -109,7 +110,9 @@ function MapContents() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        {markers}
+        <MarkerClusterGroup>
+          {markers}
+        </MarkerClusterGroup>
         <div className="leaflet-top leaflet-right">
           <div className="leaflet-control leaflet-bar">
             <a href="#" onClick={() => setDrivingMode(!drivingMode)} style={{width: "110px"}}>{ drivingMode ? "Stop driving mode" : "Start driving mode" }</a>

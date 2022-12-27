@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@changey/react-leaflet-markercluster": "^4.0.0-rc1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -11,6 +12,7 @@
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "leaflet": "^1.9.3",
+    "leaflet.markercluster": "^1.5.3",
     "moment": "^2.29.4",
     "noty": "^3.2.0-beta-deprecated",
     "react": "^18.2.0",
