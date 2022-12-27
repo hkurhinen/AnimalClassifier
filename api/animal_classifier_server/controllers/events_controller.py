@@ -8,7 +8,7 @@ from animal_classifier_server.models.error import Error  # noqa: E501
 from animal_classifier_server.models.event import Event  # noqa: E501
 from animal_classifier_server import util
 from animal_classifier_server.database.db import get_database
-from animal_classifier_server.mqtt.mqtt import connect_mqtt
+from animal_classifier_server.mqtt.mqtt import get_mqtt_client
 
 from bson import json_util
 import json
@@ -27,10 +27,9 @@ def create_event():  # noqa: E501
         event = Event.from_dict(connexion.request.get_json())  # noqa: E501
         db = get_database()
         db["events"].insert_one(event.to_dict())
-        mqtt_client = connect_mqtt()
+        mqtt_client = get_mqtt_client()
         for classification in event.classifications:
           mqtt_client.publish(classification.result, json.dumps({'image': event.image, 'latitude': event.latitude, 'longitude': event.longitude}))
-        mqtt_client.disconnect()
     return '201 Created successfully.'
 
 
