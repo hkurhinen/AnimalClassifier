@@ -29,8 +29,6 @@ if __name__ == "__main__":
     server_url = sys.argv[3] 
 
     stream = MQTTUtils.createStream(ssc, broker_url, topic, username=None, password=None)
-    class_names = ['airplane', 'automobile', 'bird', 'cat', 'deer',
-                  'dog', 'frog', 'horse', 'ship', 'truck']
 
     def loadImgFromUrl(url):
       f_name = utils.download(url, 'to_classify_deer_classifier_yolo.jpg', True)
