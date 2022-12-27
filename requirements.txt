@@ -1,3 +1,5 @@
 keras==2.10.0
 numpy==1.23.4
 pyspark==3.3.0
+mxnet==1.9.1
+gluoncv==0.10.5
